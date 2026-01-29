@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Autopedido</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  text-align: center;
+}
+
+.pantalla {
+  padding: 30px 15px;
+}
+
+.oculto {
+  display: none;
+}
+
+button {
+  width: 90%;
+  max-width: 420px;
+  margin: 12px auto;
+  padding: 18px;
+  font-size: 20px;
+  border: none;
+  border-radius: 12px;
+  background: #d32f2f;
+  color: white;
+  cursor: pointer;
+}
+
+button.sec {
+  background: #333;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  font-size: 18px;
+}
+
+hr {
+  margin: 20px 0;
+}
+</style>
+</head>
+
+<body>
+
+<!-- BIENVENIDA -->
+<div id="bienvenida" class="pantalla">
+  <h1>🍔 SANDWICHERÍA SANTY</h1>
+  <button onclick="mostrar('menu')">TOCÁ PARA COMENZAR</button>
+  <button class="sec" onclick="mostrarCocina()">PANTALLA COCINA</button>
+</div>
+
+<!-- MENU -->
+<div id="menu" class="pantalla oculto">
+  <h2>MENÚ</h2>
+  <button onclick="agregar('Combo 1',4500)">Combo 1 $4500</button>
+  <button onclick="agregar('Combo 2',4800)">Combo 2 $4800</button>
+  <button onclick="agregar('Combo 3',5200)">Combo 3 $5200</button>
+
+  <h3>Total: $<span id="total">0</span></h3>
+  <button onclick="mostrar('carrito')">VER PEDIDO</button>
+</div>
+
+<!-- CARRITO -->
+<div id="carrito" class="pantalla oculto">
+  <h2>TU PEDIDO</h2>
+  <ul id="lista"></ul>
+  <h3>Total: $<span id="total2">0</span></h3>
+
+  <button onclick="mostrar('pago')">PAGAR</button>
+  <button class="sec" onclick="mostrar('menu')">VOLVER</button>
+</div>
+
+<!-- PAGO -->
+<div id="pago" class="pantalla oculto">
+  <h2>PAGO</h2>
+  <p>(Modo demo)</p>
+  <button onclick="confirmarPago()">💳 TARJETA / QR</button>
+</div>
+
+<!-- TICKET -->
+<div id="ticket" class="pantalla oculto">
+  <h2>✅ PEDIDO CONFIRMADO</h2>
+  <h1>N° <span id="orden"></span></h1>
+  <div id="ticketPrint">
+    <p>Sandwichería Santy</p>
+    <p>Pedido N° <span id="orden2"></span></p>
+    <ul id="ticketLista"></ul>
+    <p>Total: $<span id="ticketTotal"></span></p>
+  </div>
+  <button onclick="imprimir()">🖨 IMPRIMIR TICKET</button>
+  <button onclick="reiniciar()">FINALIZAR</button>
+</div>
+
+<!-- COCINA -->
+<div id="cocina" class="pantalla oculto">
+  <h2>🍳 COCINA</h2>
+  <div id="pedidosCocina"></div>
+  <button class="sec" onclick="mostrar('bienvenida')">SALIR</button>
+</div>
+
+<script>
+let pedido = [];
+let total = 0;
+let ordenActual = Number(localStorage.getItem("orden")) || 1;
+let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+
+function mostrar(id){
+  document.querySelectorAll(".pantalla").forEach(p=>p.classList.add("oculto"));
+  document.getElementById(id).classList.remove("oculto");
+}
+
+function agregar(nombre, precio){
+  pedido.push({nombre,precio});
+  total += precio;
+  document.getElementById("total").innerText = total;
+}
+
+function confirmarPago(){
+  const orden = ordenActual++;
+  localStorage.setItem("orden", ordenActual);
+
+  pedidos.push({orden, pedido:[...pedido], total, estado:"Preparando"});
+  localStorage.setItem("pedidos", JSON.stringify(pedidos));
+
+  document.getElementById("orden").innerText = orden;
+  document.getElementById("orden2").innerText = orden;
+  document.getElementById("ticketTotal").innerText = total;
+
+  const tl = document.getElementById("ticketLista");
+  tl.innerHTML = "";
+  pedido.forEach(p=>{
+    const li=document.createElement("li");
+    li.innerText=p.nombre+" $"+p.precio;
+    tl.appendChild(li);
+  });
+
+  mostrar("ticket");
+}
+
+function imprimir(){
+  window.print();
+}
+
+function reiniciar(){
+  pedido=[];
+  total=0;
+  document.getElementById("total").innerText=0;
+  mostrar("bienvenida");
+}
+
+function mostrarCocina(){
+  mostrar("cocina");
+  const cont=document.getElementById("pedidosCocina");
+  cont.innerHTML="";
+  pedidos.forEach(p=>{
+    const div=document.createElement("div");
+    div.innerHTML=`
+      <hr>
+      <h3>Pedido ${p.orden}</h3>
+      <p>${p.pedido.map(x=>x.nombre).join(", ")}</p>
+      <p>Estado: ${p.estado}</p>
+      <button onclick="marcarListo(${p.orden})">MARCAR LISTO</button>
+    `;
+    cont.appendChild(div);
+  });
+}
+
+function marcarListo(n){
+  pedidos=pedidos.map(p=>{
+    if(p.orden===n) p.estado="LISTO";
+    return p;
+  });
+  localStorage.setItem("pedidos",JSON.stringify(pedidos));
+  mostrarCocina();
+}
+</script>
+
+</body>
+</html>
