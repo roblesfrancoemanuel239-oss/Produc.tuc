@@ -145,8 +145,23 @@ let ordenActual = Number(localStorage.getItem("orden")) || 1;
 let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
 
 function mostrar(id){
-  document.querySelectorAll(".pantalla").forEach(p=>p.classList.add("oculto"));
+  document.querySelectorAll(".pantalla").forEach(p =>
+    p.classList.add("oculto")
+  );
   document.getElementById(id).classList.remove("oculto");
+
+  if(id === "carrito"){
+    const lista = document.getElementById("lista");
+    lista.innerHTML = "";
+
+    pedido.forEach(p => {
+      const li = document.createElement("li");
+      li.innerText = p.nombre + " $ " + p.precio;
+      lista.appendChild(li);
+    });
+
+    document.getElementById("total2").innerText = total;
+  }
 }
 
 function agregar(nombre, precio){
