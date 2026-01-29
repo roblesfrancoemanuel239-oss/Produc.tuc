@@ -24,7 +24,7 @@ body {
 button {
   width: 90%;
   max-width: 420px;
-  margin: 12px auto;
+  margin: 10px auto;
   padding: 18px;
   font-size: 20px;
   border: none;
@@ -44,6 +44,12 @@ ul {
   font-size: 18px;
 }
 
+.mensaje {
+  color: green;
+  font-weight: bold;
+  margin: 10px;
+}
+
 hr {
   margin: 20px 0;
 }
@@ -56,17 +62,23 @@ hr {
 <div id="bienvenida" class="pantalla">
   <h1>🍔 SANDWICHERÍA SANTY</h1>
   <button onclick="mostrar('menu')">TOCÁ PARA COMENZAR</button>
-  <button class="sec" onclick="mostrarCocina()">PANTALLA COCINA</button>
+  <button class="sec" onclick="pedirClave()">PANTALLA COCINA</button>
 </div>
 
 <!-- MENU -->
 <div id="menu" class="pantalla oculto">
   <h2>MENÚ</h2>
+
   <button onclick="agregar('Combo 1',4500)">Combo 1 $4500</button>
   <button onclick="agregar('Combo 2',4800)">Combo 2 $4800</button>
   <button onclick="agregar('Combo 3',5200)">Combo 3 $5200</button>
 
+  <p class="mensaje" id="msg"></p>
+
+  <h3>Productos: <span id="cantidad">0</span></h3>
   <h3>Total: $<span id="total">0</span></h3>
+
+  <button onclick="quitarUltimo()">❌ QUITAR ÚLTIMO</button>
   <button onclick="mostrar('carrito')">VER PEDIDO</button>
 </div>
 
@@ -91,13 +103,19 @@ hr {
 <div id="ticket" class="pantalla oculto">
   <h2>✅ PEDIDO CONFIRMADO</h2>
   <h1>N° <span id="orden"></span></h1>
+
+  <p>⏱️ Tu pedido está en preparación</p>
+  <p>Te llamamos por número</p>
+
   <div id="ticketPrint">
     <p>Sandwichería Santy</p>
     <p>Pedido N° <span id="orden2"></span></p>
+    <p id="fechaHora"></p>
     <ul id="ticketLista"></ul>
     <p>Total: $<span id="ticketTotal"></span></p>
   </div>
-  <button onclick="imprimir()">🖨 IMPRIMIR TICKET</button>
+
+  <button onclick="imprimir()">🖨 IMPRIMIR</button>
   <button onclick="reiniciar()">FINALIZAR</button>
 </div>
 
@@ -105,8 +123,13 @@ hr {
 <div id="cocina" class="pantalla oculto">
   <h2>🍳 COCINA</h2>
   <div id="pedidosCocina"></div>
+  <button onclick="limpiarListos()">🧹 LIMPIAR LISTOS</button>
   <button class="sec" onclick="mostrar('bienvenida')">SALIR</button>
 </div>
+
+<audio id="sonido">
+  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">
+</audio>
 
 <script>
 let pedido = [];
@@ -123,6 +146,17 @@ function agregar(nombre, precio){
   pedido.push({nombre,precio});
   total += precio;
   document.getElementById("total").innerText = total;
+  document.getElementById("cantidad").innerText = pedido.length;
+  document.getElementById("msg").innerText = "✔ Producto agregado";
+  setTimeout(()=>document.getElementById("msg").innerText="",1000);
+}
+
+function quitarUltimo(){
+  if(pedido.length>0){
+    total -= pedido.pop().precio;
+    document.getElementById("total").innerText = total;
+    document.getElementById("cantidad").innerText = pedido.length;
+  }
 }
 
 function confirmarPago(){
@@ -132,12 +166,15 @@ function confirmarPago(){
   pedidos.push({orden, pedido:[...pedido], total, estado:"Preparando"});
   localStorage.setItem("pedidos", JSON.stringify(pedidos));
 
+  document.getElementById("sonido").play();
+
   document.getElementById("orden").innerText = orden;
   document.getElementById("orden2").innerText = orden;
   document.getElementById("ticketTotal").innerText = total;
+  document.getElementById("fechaHora").innerText = new Date().toLocaleString();
 
   const tl = document.getElementById("ticketLista");
-  tl.innerHTML = "";
+  tl.innerHTML="";
   pedido.forEach(p=>{
     const li=document.createElement("li");
     li.innerText=p.nombre+" $"+p.precio;
@@ -147,15 +184,18 @@ function confirmarPago(){
   mostrar("ticket");
 }
 
-function imprimir(){
-  window.print();
-}
+function imprimir(){ window.print(); }
 
 function reiniciar(){
-  pedido=[];
-  total=0;
+  pedido=[]; total=0;
   document.getElementById("total").innerText=0;
+  document.getElementById("cantidad").innerText=0;
   mostrar("bienvenida");
+}
+
+function pedirClave(){
+  const clave = prompt("Ingrese clave cocina:");
+  if(clave==="1234") mostrarCocina();
 }
 
 function mostrarCocina(){
@@ -180,6 +220,12 @@ function marcarListo(n){
     if(p.orden===n) p.estado="LISTO";
     return p;
   });
+  localStorage.setItem("pedidos",JSON.stringify(pedidos));
+  mostrarCocina();
+}
+
+function limpiarListos(){
+  pedidos = pedidos.filter(p=>p.estado!=="LISTO");
   localStorage.setItem("pedidos",JSON.stringify(pedidos));
   mostrarCocina();
 }
