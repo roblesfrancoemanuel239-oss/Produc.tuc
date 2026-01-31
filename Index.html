@@ -1,270 +1,264 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Autopedido</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f5f5f5;
-  text-align: center;
-}
-
-.pantalla {
-  padding: 30px 15px;
-}
-
-.oculto {
-  display: none;
-}
-
-button {
-  width: 90%;
-  max-width: 420px;
-  margin: 10px auto;
-  padding: 18px;
-  font-size: 20px;
-  border: none;
-  border-radius: 12px;
-  background: #d32f2f;
-  color: white;
-  cursor: pointer;
-}
-
-button.sec {
-  background: #333;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  font-size: 18px;
-}
-
-.mensaje {
-  color: green;
-  font-weight: bold;
-  margin: 10px;
-}
-
-hr {
-  margin: 20px 0;
-}
-</style>
+    <meta charset="UTF-8">
+    <title>Santy - Autopedido</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --primario: #d32f2f; --secundario: #333; --fondo: #f5f5f5; --blanco: #ffffff; --exito: #2e7d32; }
+        body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: var(--fondo); text-align: center; color: #333; }
+        .pantalla { padding: 20px; max-width: 500px; margin: auto; min-height: 100vh; }
+        .oculto { display: none !important; }
+        .cat-titulo { text-align: left; background: #e0e0e0; padding: 8px 12px; border-radius: 8px; font-size: 1.1rem; margin-top: 25px; border-left: 5px solid var(--primario); }
+        .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
+        .btn-producto { background: var(--blanco); border: 1px solid #ddd; border-radius: 12px; padding: 15px 8px; font-size: 0.9rem; font-weight: bold; display: flex; flex-direction: column; cursor: pointer; }
+        .precio-tag { color: var(--exito); margin-top: 5px; font-size: 1rem; }
+        .btn-main { width: 100%; padding: 16px; font-size: 1.1rem; border: none; border-radius: 12px; background: var(--primario); color: white; font-weight: bold; margin-top: 15px; cursor: pointer; }
+        .btn-sec { background: var(--secundario); }
+        .modal-pago { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 9999; display: flex; align-items: center; justify-content: center; }
+        .modal-contenido { background: white; padding: 30px 20px; border-radius: 20px; width: 85%; max-width: 350px; }
+        .barra-total { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 20px; box-shadow: 0 -3px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .resumen-turno { background: var(--secundario); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: left; font-size: 0.9rem; }
+        label { display: block; padding: 15px; margin: 10px 0; border-radius: 10px; background: #f9f9f9; border: 2px solid #eee; cursor: pointer; font-weight: bold; }
+        input[type="radio"] { transform: scale(1.5); margin-right: 15px; }
+    </style>
 </head>
 
 <body>
 
-<!-- BIENVENIDA -->
+<div id="modalPago" class="modal-pago oculto">
+    <div class="modal-contenido">
+        <h2 style="margin-top:0;">Transferencia</h2>
+        <p style="margin-bottom:5px; color:#666;">Monto a transferir:</p>
+        <strong id="montoTransferir" style="font-size: 3.5rem; color: var(--exito); display: block; margin-bottom: 20px;">$0</strong>
+        <div style="background: #f0f0f0; padding: 20px; border-radius: 15px; border: 2px dashed #999;">
+            <p style="margin:0; font-size: 1rem; color:#555;">Alias Mercado Pago:</p>
+            <strong style="font-size: 1.8rem; color: #009ee3; letter-spacing: 1px;">BARSANTI.</strong>
+        </div>
+        <button class="btn-main" onclick="confirmarPedido('Transferencia')" style="background:#009ee3; margin-top:20px;">YA TRANSFERÍ</button>
+        <button onclick="document.getElementById('modalPago').classList.add('oculto')" style="background:none; border:none; color:#666; margin-top:15px; cursor:pointer; font-weight:bold;">VOLVER</button>
+    </div>
+</div>
+
 <div id="bienvenida" class="pantalla">
-  <h1>🍔 SANDWICHERÍA SANTY</h1>
-  <button onclick="mostrar('menu')">TOCÁ PARA COMENZAR</button>
-  <button class="sec" onclick="pedirClave()">PANTALLA COCINA</button>
+    <br><br>
+    <h1 style="color:var(--primario)">🍔 SANDWICHERÍA SANTY</h1>
+    <p>¡Hola! Haz tu pedido aquí</p>
+    <br>
+    <button class="btn-main" onclick="mostrar('menu')">PEDIR AHORA</button>
+    <button class="btn-main btn-sec" onclick="pedirClave()">MODO COCINA</button>
 </div>
 
-<!-- MENU -->
-<div id="menu" class="pantalla oculto">
-  <h2>MENÚ</h2>
-
-  <button onclick="agregar('menu Diario',5000)">menu Diario $5.000</button>
-  <button onclick="agregar('menu Napolitana',7000)">menu Napolitana $7.000</button>
-  <button onclick="agregar('Empanada Docena',11000)">Empanada Docena $11.000</button>
-  <button onclick="agregar('Empanada media doc',6000)">Empanada media doc. $6.000</button>
-  <button onclick="agregar('Napo p1',14000)">Napo p1 $14.000</button>
-  <button onclick="agregar('Napo p2',22000)">Napo p2 $22.000</button>
-  <button onclick="agregar('mexicano p1',14000)">mexicano p1 $14.000</button>
-  <button onclick="agregar('samdwich chico de nalga',5000)">sandwich chico $5.000</button>
-  <button onclick="agregar('sandwich comum de nalga',8000)">sadwich comun $8.000</button>
-  <button onclick="agregar('sandwich especial de nalga',9000)">sandwich especial $9.000</button>
-  <button onclick="agregar('sandwich super santy',15000)">sandwich super santy $15.000</button>
-  <button onclick="agregar('sandwich mila molida chica',3000)">sandwich mila molida chica $3.000</button>
-  <button onclick="agregar('sandwich molida comun',4000)">sandwich molida comum $4.000</button>
-  <button onclick="agregar('sandwich molida super',9500)">sandwich molida super $9.500</button>
-  <button onclick="agregar('lomito comun',9000)">lomito comum $9.000</button>
-  <button onclick="agregar('lomito especial',10000)">lomito especial $10.000</button>
-  <button onclick="agregar('lomito santy',15000)">lomito santy $15.000</button>
-  <button onclick="agregar('pizza comun',9000)">pizza comun $9.000</button>
-  <button onclick="agregar('pizza especial',10000)">pizza especial $10.000</button>
-  <button onclick="agregar('pizza Santy',12000)">pizza Santy $12.000</button>
-  <button onclick="agregar('pizza Ternera',14000)">pizza Ternera $14.000</button>
-  <button onclick="agregar('agregado de Papa',1500)">agregado de papa $1500</button>
-  <button onclick="agregar('agregado',500)">agregados $500</button>
- 
-  <p class="mensaje" id="msg"></p>
-
-  <h3>Productos: <span id="cantidad">0</span></h3>
-  <h3>Total: $<span id="total">0</span></h3>
-
-  <button onclick="quitarUltimo()">⚫️ QUITAR ÚLTIMO</button>
-  <button onclick="mostrar('carrito')">VER PEDIDO</button>
+<div id="menu" class="pantalla oculto" style="padding-bottom: 100px;">
+    <h3 class="cat-titulo">✨ Menús y Promos</h3>
+    <div class="grid-menu">
+        <button class="btn-producto" onclick="agregar('Menu Diario', 5000, false)">Menu Diario <span class="precio-tag">$5.000</span></button>
+        <button class="btn-producto" onclick="agregar('Menu Napolitana', 7000, false)">Menu Napo <span class="precio-tag">$7.000</span></button>
+        <button class="btn-producto" onclick="agregar('Empanada Docena', 11000, false)">Empanada Doc. <span class="precio-tag">$11.000</span></button>
+        <button class="btn-producto" onclick="agregar('Empanada 1/2 doc', 6000, false)">Empanada 1/2 <span class="precio-tag">$6.000</span></button>
+    </div>
+    <h3 class="cat-titulo">🥩 Nalga y Lomito</h3>
+    <div class="grid-menu">
+        <button class="btn-producto" onclick="agregar('Nalga Chico', 5000, true)">Nalga Chico <span class="precio-tag">$5.000</span></button>
+        <button class="btn-producto" onclick="agregar('Nalga Común', 8000, true)">Nalga Común <span class="precio-tag">$8.000</span></button>
+        <button class="btn-producto" onclick="agregar('Nalga Especial', 9000, true)">Nalga Especial <span class="precio-tag">$9.000</span></button>
+        <button class="btn-producto" onclick="agregar('Lomito Común', 9000, true)">Lomito Común <span class="precio-tag">$9.000</span></button>
+        <button class="btn-producto" onclick="agregar('Lomito Especial', 10000, true)">Lomito Esp. <span class="precio-tag">$10.000</span></button>
+        <button class="btn-producto" onclick="agregar('Súper Santy', 15000, true)">SUPER SANTY <span class="precio-tag">$15.000</span></button>
+    </div>
+    <h3 class="cat-titulo">🍔 Molida</h3>
+    <div class="grid-menu">
+        <button class="btn-producto" onclick="agregar('Molida Chica', 3000, true)">Molida Chica <span class="precio-tag">$3.000</span></button>
+        <button class="btn-producto" onclick="agregar('Molida Común', 4000, true)">Molida Común <span class="precio-tag">$4.000</span></button>
+        <button class="btn-producto" onclick="agregar('Molida Super', 9500, true)">Molida Super <span class="precio-tag">$9.500</span></button>
+    </div>
+    <h3 class="cat-titulo">🍕 Pizzas</h3>
+    <div class="grid-menu">
+        <button class="btn-producto" onclick="agregar('Pizza Común', 9000, false)">Pizza Común <span class="precio-tag">$9.000</span></button>
+        <button class="btn-producto" onclick="agregar('Pizza Especial', 10000, false)">Pizza Especial <span class="precio-tag">$10.000</span></button>
+        <button class="btn-producto" onclick="agregar('Pizza Santy', 12000, false)">Pizza Santy <span class="precio-tag">$12.000</span></button>
+    </div>
+    <div class="barra-total">
+        <div><strong>Total: $<span id="total">0</span></strong></div>
+        <button onclick="mostrar('carrito')" style="background:var(--exito); color:white; border:none; padding:12px 20px; border-radius:10px; font-weight:bold;">VER PEDIDO</button>
+    </div>
 </div>
 
-<!-- CARRITO -->
+<div id="configurador" class="pantalla oculto">
+    <h3>¿Cómo quieres tu sándwich?</h3>
+    <div class="opcion-card">
+        <label><input type="radio" name="prep" value="COMPLETO" checked> 🔥 COMPLETO</label>
+        <label><input type="radio" name="prep" value="VERDURA Y MAYO"> 🥬 VERDURA Y MAYO</label>
+        <label><input type="radio" name="prep" value="SOLO VERDURA"> 🥬 SOLO VERDURA</label>
+        <label><input type="radio" name="prep" value="SOLO CARNE"> 🥩 SOLO CARNE</label>
+    </div>
+    <button class="btn-main" onclick="finalizarConfiguracion()">AGREGAR</button>
+</div>
+
 <div id="carrito" class="pantalla oculto">
-  <h2>TU PEDIDO</h2>
-  <ul id="lista"></ul>
-  <h3>Total: $<span id="total2">0</span></h3>
-
-  <button onclick="mostrar('pago')">PAGAR</button>
-  <button class="sec" onclick="mostrar('menu')">VOLVER</button>
+    <h2>Tu Pedido</h2>
+    <div style="background:white; border-radius:12px; padding:15px; text-align:left; border: 1px solid #ddd;">
+        <ul id="lista" style="list-style:none; padding:0; margin:0;"></ul>
+        <hr>
+        <h3 style="margin:10px 0;">Total: $<span id="total2">0</span></h3>
+    </div>
+    <button class="btn-main" onclick="mostrar('pago')">CONFIRMAR</button>
+    <button class="btn-main btn-sec" onclick="mostrar('menu')">AGREGAR MÁS</button>
 </div>
 
-<!-- PAGO -->
 <div id="pago" class="pantalla oculto">
-  <h2>PAGO</h2>
-  <p>(Modo demo)</p>
-  <button onclick="confirmarPago()">💳 TARJETA / QR</button>
+    <h2>Forma de Pago</h2>
+    <button class="btn-main" onclick="confirmarPedido('Efectivo')">💵 EFECTIVO EN CAJA</button>
+    <button class="btn-main" style="background:#009ee3;" onclick="abrirTransferencia()">📱 TRANSFERENCIA / ALIAS</button>
 </div>
 
-<!-- TICKET -->
 <div id="ticket" class="pantalla oculto">
-  <h2>✅ PEDIDO CONFIRMADO</h2>
-  <h1>N° <span id="orden"></span></h1>
-
-  <p>⏱️ Tu pedido está en preparación</p>
-  <p>Te llamamos por número</p>
-
-  <div id="ticketPrint">
-    <p>Sandwichería Santy</p>
-    <p>Pedido N° <span id="orden2"></span></p>
-    <p id="fechaHora"></p>
-    <ul id="ticketLista"></ul>
-    <p>Total: $<span id="ticketTotal"></span></p>
-  </div>
-
-  <button onclick="imprimir()">🖨 IMPRIMIR</button>
-  <button onclick="reiniciar()">FINALIZAR</button>
+    <div style="background:white; padding:40px 20px; border-radius:20px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+        <h2>¡PEDIDO RECIBIDO!</h2>
+        <h1 style="font-size: 5rem; color:var(--primario);">#<span id="orden"></span></h1>
+    </div>
+    <button class="btn-main" onclick="reiniciar()">HACER OTRO PEDIDO</button>
 </div>
 
-<!-- COCINA -->
 <div id="cocina" class="pantalla oculto">
-  <h2>🍳 COCINA</h2>
-  <div id="pedidosCocina"></div>
-  <button onclick="limpiarListos()">🧹 LIMPIAR LISTOS</button>
-  <button class="sec" onclick="mostrar('bienvenida')">SALIR</button>
+    <div class="resumen-turno">
+        <h3 style="margin:0">💰 Caja del Turno</h3>
+        <p>Efectivo: <b>$<span id="cajaEfec">0</span></b></p>
+        <p>Transf: <b>$<span id="cajaTrans">0</span></b></p>
+        <hr>
+        <p>Total: <b>$<span id="cajaTotal">0</span></b> | Pedidos: <b><span id="pedidosTurno">0</span></b></p>
+        <button onclick="cerrarTurno()" style="background:red; color:white; border:none; padding:8px; border-radius:5px; width:100%; font-weight:bold;">CERRAR TURNO</button>
+    </div>
+    <div id="pedidosCocina"></div>
+    <button class="btn-main btn-sec" onclick="mostrar('bienvenida')">SALIR</button>
 </div>
-
-<audio id="sonido">
-  <source src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg">
-</audio>
 
 <script>
-let pedido = [];
-let total = 0;
+let pedido = []; let totalAcumulado = 0; let productoTemporal = null;
 let ordenActual = Number(localStorage.getItem("orden")) || 1;
-let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+let pedidosHistorial = JSON.parse(localStorage.getItem("pedidosHistorial")) || [];
+let cajaEfectivo = Number(localStorage.getItem("cajaEfectivo")) || 0;
+let cajaTransferencia = Number(localStorage.getItem("cajaTransferencia")) || 0;
+let contadorPedidos = Number(localStorage.getItem("contadorPedidos")) || 0;
 
 function mostrar(id){
-  document.querySelectorAll(".pantalla").forEach(p =>
-    p.classList.add("oculto")
-  );
-  document.getElementById(id).classList.remove("oculto");
+    document.querySelectorAll(".pantalla").forEach(p => p.classList.add("oculto"));
+    document.getElementById(id).classList.remove("oculto");
+    if(id === "carrito") cargarCarrito();
+}
 
-  if(id === "carrito"){
-    const lista = document.getElementById("lista");
-    lista.innerHTML = "";
-
+function cargarCarrito(){
+    const lista = document.getElementById("lista"); lista.innerHTML = "";
     pedido.forEach(p => {
-      const li = document.createElement("li");
-      li.innerText = p.nombre + " $ " + p.precio;
-      lista.appendChild(li);
+        lista.innerHTML += `<li style="margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px; text-align:left;">
+            <b>${p.nombre}</b> <small style="color:red">(${p.opciones})</small> <span style="float:right">$${p.precio}</span>
+        </li>`;
     });
-
-    document.getElementById("total2").innerText = total;
-  }
+    document.getElementById("total2").innerText = totalAcumulado;
 }
 
-function agregar(nombre, precio){
-  pedido.push({nombre,precio});
-  total += precio;
-  document.getElementById("total").innerText = total;
-  document.getElementById("cantidad").innerText = pedido.length;
-  document.getElementById("msg").innerText = "✔ Producto agregado";
-  setTimeout(()=>document.getElementById("msg").innerText="",1000);
+function agregar(nombre, precio, esPerso){
+    if(esPerso){ productoTemporal = { nombre, precio }; mostrar('configurador'); }
+    else { confirmarSuma(nombre, precio, "Estandar"); }
 }
 
-function quitarUltimo(){
-  if(pedido.length>0){
-    total -= pedido.pop().precio;
-    document.getElementById("total").innerText = total;
-    document.getElementById("cantidad").innerText = pedido.length;
-  }
+function finalizarConfiguracion(){
+    const prep = document.querySelector('input[name="prep"]:checked').value;
+    confirmarSuma(productoTemporal.nombre, productoTemporal.precio, prep);
+    mostrar('menu');
 }
 
-function confirmarPago(){
-  const orden = ordenActual++;
-  localStorage.setItem("orden", ordenActual);
-
-  pedidos.push({orden, pedido:[...pedido], total, estado:"Preparando"});
-  localStorage.setItem("pedidos", JSON.stringify(pedidos));
-
-  document.getElementById("sonido").play();
-
-  document.getElementById("orden").innerText = orden;
-  document.getElementById("orden2").innerText = orden;
-  document.getElementById("ticketTotal").innerText = total;
-  document.getElementById("fechaHora").innerText = new Date().toLocaleString();
-
-  const tl = document.getElementById("ticketLista");
-  tl.innerHTML="";
-  pedido.forEach(p=>{
-    const li=document.createElement("li");
-    li.innerText=p.nombre+" $"+p.precio;
-    tl.appendChild(li);
-  });
-
-  mostrar("ticket");
+function confirmarSuma(nombre, precio, opciones){
+    pedido.push({nombre, precio, opciones});
+    totalAcumulado += precio;
+    document.getElementById("total").innerText = totalAcumulado;
 }
 
-function imprimir(){ window.print(); }
-
-function reiniciar(){
-  pedido=[]; total=0;
-  document.getElementById("total").innerText=0;
-  document.getElementById("cantidad").innerText=0;
-  mostrar("bienvenida");
+function abrirTransferencia(){
+    document.getElementById("montoTransferir").innerText = "$" + totalAcumulado;
+    document.getElementById("modalPago").classList.remove("oculto");
 }
 
-function pedirClave(){
-  const clave = prompt("Ingrese clave cocina:");
-  if(clave==="1234") mostrarCocina();
+function confirmarPedido(metodo){
+    if (pedido.length === 0) return;
+    const num = ordenActual++; 
+    localStorage.setItem("orden", ordenActual);
+    
+    // GUARDADO CLAVE: Capturamos el totalAcumulado exacto en este objeto
+    const nuevaOrden = {
+        orden: num,
+        items: [...pedido],
+        montoFijo: totalAcumulado, 
+        metodo: metodo,
+        estado: "Pendiente"
+    };
+    
+    pedidosHistorial.push(nuevaOrden);
+    localStorage.setItem("pedidosHistorial", JSON.stringify(pedidosHistorial));
+    
+    document.getElementById("orden").innerText = num;
+    document.getElementById("modalPago").classList.add("oculto");
+    mostrar('ticket');
 }
+
+function pedirClave(){ if(prompt("Clave:") === "1234") mostrarCocina(); }
 
 function mostrarCocina(){
-  mostrar("cocina");
-  const cont=document.getElementById("pedidosCocina");
-  cont.innerHTML="";
-  pedidos.forEach(p=>{
-    const div=document.createElement("div");
-    div.innerHTML=`
-      <hr>
-      <h3>Pedido ${p.orden}</h3>
-      <p>${p.pedido.map(x=>x.nombre).join(", ")}</p>
-      <p>Estado: ${p.estado}</p>
-      <button onclick="marcarListo(${p.orden})">MARCAR LISTO</button>
-    `;
-    cont.appendChild(div);
-  });
+    mostrar("cocina");
+    actualizarCajaUI();
+    const cont = document.getElementById("pedidosCocina"); cont.innerHTML = "";
+    pedidosHistorial.forEach(p => {
+        if(p.estado !== "LISTO"){
+            cont.innerHTML += `
+                <div style="background:white; margin:10px 0; padding:15px; border-radius:10px; border-left:8px solid var(--primario); text-align:left;">
+                    <strong>ORDEN #${p.orden}</strong> - Pago: ${p.metodo}
+                    <ul style="padding-left:15px; margin:5px 0;">
+                        ${p.items.map(i => `<li>${i.nombre} <small>(${i.opciones})</small></li>`).join("")}
+                    </ul>
+                    <p>Monto: <b>$${p.montoFijo}</b></p>
+                    <button class="btn-main" style="padding:10px; background:var(--exito)" onclick="marcarListo(${p.orden})">MARCAR LISTO / COBRADO</button>
+                </div>`;
+        }
+    });
 }
 
 function marcarListo(n){
-  pedidos=pedidos.map(p=>{
-    if(p.orden===n) p.estado="LISTO";
-    return p;
-  });
-  localStorage.setItem("pedidos",JSON.stringify(pedidos));
-  mostrarCocina();
+    pedidosHistorial = pedidosHistorial.map(p => {
+        if(p.orden === n) {
+            p.estado = "LISTO";
+            if(p.metodo === 'Efectivo') cajaEfectivo += p.montoFijo;
+            else cajaTransferencia += p.montoFijo;
+            contadorPedidos++;
+        }
+        return p;
+    });
+    localStorage.setItem("cajaEfectivo", cajaEfectivo);
+    localStorage.setItem("cajaTransferencia", cajaTransferencia);
+    localStorage.setItem("contadorPedidos", contadorPedidos);
+    localStorage.setItem("pedidosHistorial", JSON.stringify(pedidosHistorial));
+    mostrarCocina();
 }
 
-function limpiarListos(){
-  pedidos = pedidos.filter(p=>p.estado!=="LISTO");
-  localStorage.setItem("pedidos",JSON.stringify(pedidos));
-  mostrarCocina();
+function actualizarCajaUI(){
+    document.getElementById("cajaEfec").innerText = cajaEfectivo;
+    document.getElementById("cajaTrans").innerText = cajaTransferencia;
+    document.getElementById("cajaTotal").innerText = cajaEfectivo + cajaTransferencia;
+    document.getElementById("pedidosTurno").innerText = contadorPedidos;
+}
+
+function cerrarTurno(){
+    if(confirm("¿Cerrar turno? Se reiniciará todo.")){
+        localStorage.clear();
+        location.reload();
+    }
+}
+
+function reiniciar(){
+    pedido = []; totalAcumulado = 0;
+    document.getElementById("total").innerText = 0;
+    mostrar('bienvenida');
 }
 </script>
-
 </body>
 </html>
