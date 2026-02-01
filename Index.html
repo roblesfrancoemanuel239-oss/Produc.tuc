@@ -10,7 +10,7 @@
         body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: var(--fondo); text-align: center; color: #333; }
         .pantalla { padding: 20px; max-width: 500px; margin: auto; min-height: 100vh; }
         .oculto { display: none !important; }
-        .cat-titulo { text-align: left; background: #e0e0e0; padding: 8px 12px; border-radius: 8px; font-size: 1.1rem; margin-top: 25px; border-left: 5px solid var(--primario); }
+        .cat-titulo { text-align: left; background: #e0e0e0; padding: 8px 12px; border-radius: 8px; font-size: 1.1rem; margin-top: 25px; border-left: 5px solid var(--primario); font-weight: bold; }
         .grid-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
         .btn-producto { background: var(--blanco); border: 1px solid #ddd; border-radius: 12px; padding: 15px 8px; font-size: 0.9rem; font-weight: bold; display: flex; flex-direction: column; cursor: pointer; }
         .precio-tag { color: var(--exito); margin-top: 5px; font-size: 1rem; }
@@ -22,6 +22,16 @@
         .resumen-turno { background: var(--secundario); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; text-align: left; font-size: 0.9rem; }
         label { display: block; padding: 15px; margin: 10px 0; border-radius: 10px; background: #f9f9f9; border: 2px solid #eee; cursor: pointer; font-weight: bold; }
         input[type="radio"] { transform: scale(1.5); margin-right: 15px; }
+
+        /* Estilo para el botón eliminar en el carrito */
+        .btn-eliminar { background: none; border: none; color: #d32f2f; cursor: pointer; font-size: 1.2rem; padding: 5px; }
+
+        #ticketPrint { display: none; }
+        @media print {
+            body * { visibility: hidden; }
+            #ticketPrint, #ticketPrint * { visibility: visible; }
+            #ticketPrint { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
+        }
     </style>
 </head>
 
@@ -55,8 +65,8 @@
     <div class="grid-menu">
         <button class="btn-producto" onclick="agregar('Menu Diario', 5000, false)">Menu Diario <span class="precio-tag">$5.000</span></button>
         <button class="btn-producto" onclick="agregar('Menu Napolitana', 7000, false)">Menu Napo <span class="precio-tag">$7.000</span></button>
-        <button class="btn-producto" onclick="agregar('Empanada Docena', 11000, false)">Empanada Doc. <span class="precio-tag">$11.000</span></button>
-        <button class="btn-producto" onclick="agregar('Empanada 1/2 doc', 6000, false)">Empanada 1/2 <span class="precio-tag">$6.000</span></button>
+        <button class="btn-producto" onclick="agregar('Empanada Docena', 12000, false)">Empanada Doc. <span class="precio-tag">$12.000</span></button>
+        <button class="btn-producto" onclick="agregar('Empanada 1/2 doc', 6500, false)">Empanada 1/2 <span class="precio-tag">$6.500</span></button>
     </div>
     <h3 class="cat-titulo">🥩 Nalga y Lomito</h3>
     <div class="grid-menu">
@@ -67,7 +77,7 @@
         <button class="btn-producto" onclick="agregar('Lomito Especial', 10000, true)">Lomito Esp. <span class="precio-tag">$10.000</span></button>
         <button class="btn-producto" onclick="agregar('Súper Santy', 15000, true)">SUPER SANTY <span class="precio-tag">$15.000</span></button>
     </div>
-     <h3 class="cat-titulo">Gaseosas</h3>
+    <h3 class="cat-titulo">🥤 Gaseosas</h3>
     <div class="grid-menu">
         <button class="btn-producto" onclick="agregar('CocaCola 1Lt', 4000, false)">CocaCola 1Lt <span class="precio-tag">$4.000</span></button>
         <button class="btn-producto" onclick="agregar('CocaCola 1,5 Lt', 4500, false)">CocaCola 1,5 <span class="precio-tag">$4.500</span></button>
@@ -85,7 +95,7 @@
         <button class="btn-producto" onclick="agregar('Molida Común', 4000, true)">Molida Común <span class="precio-tag">$4.000</span></button>
         <button class="btn-producto" onclick="agregar('Molida Super', 9500, true)">Molida Super <span class="precio-tag">$9.500</span></button>
     </div>
-    <h3 class="cat-titulo">🍕 Pizzas,Napo y Mexicano</h3>
+    <h3 class="cat-titulo">🍕 Pizzas, Napo y Mexicano</h3>
     <div class="grid-menu">
         <button class="btn-producto" onclick="agregar('Pizza Común', 9000, false)">Pizza Común <span class="precio-tag">$9.000</span></button>
         <button class="btn-producto" onclick="agregar('Pizza Especial', 10000, false)">Pizza Especial <span class="precio-tag">$10.000</span></button>
@@ -95,24 +105,25 @@
         <button class="btn-producto" onclick="agregar('napo p1', 14000, false)">napo p1 <span class="precio-tag">$14.000</span></button> 
         <button class="btn-producto" onclick="agregar('napo p2', 22000, false)">napo p2 <span class="precio-tag">$22.000</span></button> 
     </div>
-     <h3 class="cat-titulo">Agregados</h3>
+    <h3 class="cat-titulo">➕ Agregados</h3>
     <div class="grid-menu">
         <button class="btn-producto" onclick="agregar('Papas Fritas', 1000, false)">Papas Fritas <span class="precio-tag">$1.000</span></button>
         <button class="btn-producto" onclick="agregar('Huevo', 500, false)">Huevo <span class="precio-tag">$500</span></button>
         <button class="btn-producto" onclick="agregar('Queso', 500, false)">Queso <span class="precio-tag">$500</span></button> 
         <button class="btn-producto" onclick="agregar('Jamon', 500, false)">Jamon <span class="precio-tag">$500</span></button> 
     </div>
-      <h3 class="cat-titulo">Hamburguesas</h3>
+    <h3 class="cat-titulo">🍔 Hamburguesas</h3>
     <div class="grid-menu">
         <button class="btn-producto" onclick="agregar('Comun', 7000, true)">Comun <span class="precio-tag">$7.000</span></button>
         <button class="btn-producto" onclick="agregar('Especial', 8000, true)">Especial <span class="precio-tag">$8.000</span></button>
-        <button class="btn-producto" onclick="agregar('Cheddar', 8000, true)">cheddarl <span class="precio-tag">$8.000</span></button>
+        <button class="btn-producto" onclick="agregar('Cheddar', 8000, true)">Cheddar <span class="precio-tag">$8.000</span></button>
     </div>
     <div class="barra-total">
         <div><strong>Total: $<span id="total">0</span></strong></div>
         <button onclick="mostrar('carrito')" style="background:var(--exito); color:white; border:none; padding:12px 20px; border-radius:10px; font-weight:bold;">VER PEDIDO</button>
     </div>
 </div>
+
 <div id="configurador" class="pantalla oculto">
     <h3>¿Cómo quieres tu sándwich?</h3>
     <div class="opcion-card">
@@ -147,6 +158,7 @@
         <h2>¡PEDIDO RECIBIDO!</h2>
         <h1 style="font-size: 5rem; color:var(--primario);">#<span id="orden"></span></h1>
     </div>
+    <button class="btn-main" onclick="window.print()">🖨️ IMPRIMIR TICKET</button>
     <button class="btn-main" onclick="reiniciar()">HACER OTRO PEDIDO</button>
 </div>
 
@@ -161,6 +173,19 @@
     </div>
     <div id="pedidosCocina"></div>
     <button class="btn-main btn-sec" onclick="mostrar('bienvenida')">SALIR</button>
+</div>
+
+<div id="ticketPrint" style="width:280px; font-family:monospace; padding: 20px; text-align: left;">
+    <h3 style="text-align:center;">SANDWICHERÍA SANTY</h3>
+    <hr>
+    <p>Orden: <span id="tOrden"></span></p>
+    <p>Fecha: <span id="tFecha"></span></p>
+    <p>Hora: <span id="tHora"></span></p>
+    <hr>
+    <div id="tItems"></div>
+    <hr>
+    <h3 style="text-align:right;">Total: $<span id="tTotal"></span></h3>
+    <p style="text-align:center;">¡Gracias por su compra!</p>
 </div>
 
 <script>
@@ -179,12 +204,23 @@ function mostrar(id){
 
 function cargarCarrito(){
     const lista = document.getElementById("lista"); lista.innerHTML = "";
-    pedido.forEach(p => {
-        lista.innerHTML += `<li style="margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px; text-align:left;">
-            <b>${p.nombre}</b> <small style="color:red">(${p.opciones})</small> <span style="float:right">$${p.precio}</span>
+    pedido.forEach((p, index) => {
+        lista.innerHTML += `<li style="margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px; display:flex; justify-content:space-between; align-items:center; text-align:left;">
+            <div>
+                <b>${p.nombre}</b> <small style="color:red">(${p.opciones})</small><br>
+                <span>$${p.precio}</span>
+            </div>
+            <button class="btn-eliminar" onclick="eliminarProducto(${index})"><i class="fas fa-trash"></i></button>
         </li>`;
     });
     document.getElementById("total2").innerText = totalAcumulado;
+}
+
+function eliminarProducto(index) {
+    totalAcumulado -= pedido[index].price || pedido[index].precio;
+    pedido.splice(index, 1);
+    document.getElementById("total").innerText = totalAcumulado;
+    cargarCarrito();
 }
 
 function agregar(nombre, precio, esPerso){
@@ -214,7 +250,6 @@ function confirmarPedido(metodo){
     const num = ordenActual++; 
     localStorage.setItem("orden", ordenActual);
     
-    // GUARDADO CLAVE: Capturamos el totalAcumulado exacto en este objeto
     const nuevaOrden = {
         orden: num,
         items: [...pedido],
@@ -226,9 +261,27 @@ function confirmarPedido(metodo){
     pedidosHistorial.push(nuevaOrden);
     localStorage.setItem("pedidosHistorial", JSON.stringify(pedidosHistorial));
     
+    imprimirTicket(nuevaOrden);
+    
     document.getElementById("orden").innerText = num;
     document.getElementById("modalPago").classList.add("oculto");
     mostrar('ticket');
+}
+
+function imprimirTicket(nuevaOrden){
+    const ahora = new Date();
+    document.getElementById("tOrden").innerText = nuevaOrden.orden;
+    document.getElementById("tFecha").innerText = ahora.toLocaleDateString();
+    document.getElementById("tHora").innerText = ahora.toLocaleTimeString();
+    document.getElementById("tTotal").innerText = nuevaOrden.montoFijo;
+
+    const itemsDiv = document.getElementById("tItems");
+    itemsDiv.innerHTML = "";
+    nuevaOrden.items.forEach(i => {
+        itemsDiv.innerHTML += `<p style="margin:5px 0;">${i.nombre} (${i.opciones}) - $${i.precio}</p>`;
+    });
+
+    window.print();
 }
 
 function pedirClave(){ if(prompt("Clave:") === "1234") mostrarCocina(); }
@@ -254,7 +307,7 @@ function mostrarCocina(){
 
 function marcarListo(n){
     pedidosHistorial = pedidosHistorial.map(p => {
-        if(p.orden === n) {
+        if(p.orden === n && p.estado !== "LISTO") {
             p.estado = "LISTO";
             if(p.metodo === 'Efectivo') cajaEfectivo += p.montoFijo;
             else cajaTransferencia += p.montoFijo;
